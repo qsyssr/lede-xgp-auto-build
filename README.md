@@ -2,6 +2,11 @@
 
 [![Build and Release](https://github.com/zzzz0317/lede-xgp-auto-build/actions/workflows/build.yml/badge.svg)](https://github.com/zzzz0317/lede-xgp-auto-build/actions/workflows/build.yml)
 
+## 已知问题
+
+1. 外置USB端口连接存储设备时，系统更新似乎会写入到外置存储设备而非NAND，但无法从外置存储设备启动，似乎是所有固件的通病？
+2. [d5f64b32999fb68b7d23c03f08b7d2f52cdfacfc](https://github.com/coolsnowwolf/lede/commit/d5f64b32999fb68b7d23c03f08b7d2f52cdfacfc) 这个commit消失了，固件自动编译目前不可用
+
 内嵌常用软件包
 
 ## 说明
