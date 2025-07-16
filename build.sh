@@ -11,7 +11,7 @@ make defconfig || { echo "defconfig failed"; exit 1; }
 echo "diff initial config and new config:"
 diff ../xgp.config .config
 echo "check device exist"
-grep -Fxq "CONFIG_TARGET_rockchip_armv8_DEVICE_nlnet_xgp=y" .config || exit 1
+grep -Fxq "CONFIG_TARGET_rockchip_armv8_DEVICE_nlnet_xiguapi-v3=y" .config || exit 1
 echo "make download"
 make download -j8 || { echo "download failed"; exit 1; }
 echo "make lede"

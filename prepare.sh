@@ -10,7 +10,8 @@ if [ -d "lede" ]; then
     git pull || { echo "git pull failed"; exit 1; }
 else
     echo "repo dir not exists"
-    git clone "https://github.com/coolsnowwolf/lede.git" || { echo "git clone failed"; exit 1; }
+#    git clone "https://github.com/coolsnowwolf/lede.git" || { echo "git clone failed"; exit 1; }
+    git clone -b xgp-20250713 "https://github.com/zzzz0317/lede.git" || { echo "git clone failed"; exit 1; }
     cd lede
 fi
 

@@ -4,10 +4,8 @@
 
 ## 已知问题
 
-1. 外置USB端口连接存储设备时，系统更新似乎会写入到外置存储设备而非NAND，但无法从外置存储设备启动，似乎是所有固件的通病？
-2. [d5f64b32999fb68b7d23c03f08b7d2f52cdfacfc](https://github.com/coolsnowwolf/lede/commit/d5f64b32999fb68b7d23c03f08b7d2f52cdfacfc) 这个commit消失了，固件自动编译目前不可用
-
-内嵌常用软件包
+1. 外置USB端口连接存储设备时，系统更新似乎会写入到外置存储设备而非NAND，但无法从外置存储设备启动，似乎是所有固件的通病？（2025-07-17新版本已修复）
+2. [d5f64b32999fb68b7d23c03f08b7d2f52cdfacfc](https://github.com/coolsnowwolf/lede/commit/d5f64b32999fb68b7d23c03f08b7d2f52cdfacfc) 这个commit消失了，目前正在重新提交[#13604](https://github.com/coolsnowwolf/lede/pull/13604)，当前使用作者自行维护的分支[xgp-20250713](https://github.com/zzzz0317/lede/tree/xgp-20250713)编译。
 
 ## 说明
 
