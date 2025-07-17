@@ -1,6 +1,7 @@
 #!/bin/sh
+is_first_boot=`uci -q get zz_config.@status[0].first_boot`
+if test $is_first_boot -gt 0; then
 #echo -e "xgpxgpxgp\nxgpxgpxgp" | (passwd root)
-
 uci set system.@system[0].hostname='zzXGP'
 uci commit system
 uci del dhcp.lan.ra_slaac
@@ -15,14 +16,10 @@ uci set luci.main.mediaurlbase='/luci-static/argon'
 #uci set luci-fan.@luci-fan[0].enabled='1'
 #uci set luci-fan.@luci-fan[0].off_temp='10'
 #uci set luci-fan.@luci-fan[0].on_temp='25'
-
 uci set qmodem.main.enable_pcie_scan='1'
 uci set qmodem.main.enable_usb_scan='1'
-
 uci commit
-#ubus call network reload
 /etc/init.d/network reload
-#sleep 30
 uci set wireless.radio0.cell_density='0'
 uci set wireless.default_radio0.ssid='zzXGP'
 uci set wireless.default_radio0.encryption='psk2+ccmp'
@@ -31,12 +28,14 @@ uci set wireless.default_radio1.ssid='zzXGP'
 uci set wireless.default_radio1.encryption='psk2+ccmp'
 uci set wireless.default_radio1.key='xgpxgpxgp'
 uci commit wireless
+/etc/init.d/network reload
+wifi
+uci -q set zz_config.@status[0].first_boot=0
+uci commit zz_config
+fi
 
 sed -i "s?set wireless\.default_radio\${devidx}\.ssid=LEDE?set wireless\.default_radio\${devidx}\.ssid=\'zzXGP\'?g" /lib/wifi/mac80211.sh
 sed -i "s?set wireless\.default_radio\${devidx}\.encryption=none?set wireless\.default_radio\${devidx}\.encryption=\'psk2+ccmp\'\n\t\t\tset wireless\.default_radio\${devidx}\.key=\'xgpxgpxgp\'?g" /lib/wifi/mac80211.sh
-
-/etc/init.d/network reload
-wifi
 
 uci set alpha.@navbar[2].name='nlbw'
 uci set alpha.@navbar[2].enable='Enable'
