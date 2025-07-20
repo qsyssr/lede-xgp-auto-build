@@ -107,12 +107,12 @@ jobs:
           echo "RELEASE_TITLE=${RELEASE_DATE} - ${VERSION}" >> $GITHUB_OUTPUT
       - name: Create new tag
         run: |
-          git tag ${{ steps.check-changes.outputs.new_tag }}
-          git push origin ${{ steps.check-changes.outputs.new_tag }}
+          git tag ${{ steps.release-prepare.outputs.new_tag }}
+          git push origin ${{ steps.release-prepare.outputs.new_tag }}
       - name: Create release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: ${{ steps.check-changes.outputs.new_tag }}
+          tag_name: ${{ steps.release-prepare.outputs.new_tag }}
           # tag_name: ${{ inputs.tag_name }}
           name: ${{ steps.release-prepare.outputs.RELEASE_TITLE }}
           body_path: release_assets/openwrt-rockchip-armv8-nlnet_xiguapi-v3.manifest
