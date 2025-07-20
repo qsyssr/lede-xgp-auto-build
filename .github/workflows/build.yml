@@ -101,10 +101,11 @@ jobs:
           current_time=$(TZ=Asia/Shanghai date +'%H%M%S')
           echo "current_date=${current_date}" >> $GITHUB_OUTPUT
           echo "current_time=${current_time}" >> $GITHUB_OUTPUT
+          echo "new_tag=v0.${current_date}.${current_time}" >> $GITHUB_OUTPUT
           RELEASE_DATE=$(TZ=Asia/Shanghai date '+%Y-%m-%d %H:%M:%S')
           VERSION=$(cat release_assets/version.buildinfo | grep '^r' | head -n 1)
           echo "RELEASE_TITLE=${RELEASE_DATE} - ${VERSION}" >> $GITHUB_OUTPUT
-      - name: Create new tag if needed
+      - name: Create new tag
         run: |
           git tag ${{ steps.check-changes.outputs.new_tag }}
           git push origin ${{ steps.check-changes.outputs.new_tag }}
