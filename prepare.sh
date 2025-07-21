@@ -8,12 +8,20 @@ if [ -d "lede" ]; then
     echo "repo dir exists"
     cd lede
     git pull || { echo "git pull failed"; exit 1; }
+    exit 0
 else
     echo "repo dir not exists"
-#    git clone "https://github.com/coolsnowwolf/lede.git" || { echo "git clone failed"; exit 1; }
-    git clone -b xgp-20250713 "https://github.com/zzzz0317/lede.git" || { echo "git clone failed"; exit 1; }
+    git clone "https://github.com/coolsnowwolf/lede.git" || { echo "git clone failed"; exit 1; }
+#    git clone -b xgp-20250713 "https://github.com/zzzz0317/lede.git" || { echo "git clone failed"; exit 1; }
     cd lede
+#    echo "apply patch"
+#    wget -O zzxgp.patch https://github.com/coolsnowwolf/lede/pull/13604.diff
+#    git am zzxgp.patch || { echo "patch apply failed"; exit 1; }
 fi
+
+echo "apply diff patch"
+wget -O zzxgp.diff https://github.com/coolsnowwolf/lede/pull/13604.diff
+git apply zzxgp.diff
 
 cat feeds.conf.default > feeds.conf
 echo "" >> feeds.conf
