@@ -64,6 +64,7 @@ jobs:
           cp lede/bin/targets/rockchip/armv8/profiles.json release_assets/ || true
           cp lede/bin/targets/rockchip/armv8/version.buildinfo release_assets/ || true
           cp lede/bin/targets/rockchip/armv8/sha256sums release_assets/ || true
+          bash -c "cd lede && git log -n 30" > release_assets/recent_git.log
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
@@ -94,7 +95,7 @@ jobs:
         run: |
           ls -lah
           ls -lah release_assets
-      - name: Get current date and time for release info
+      - name: Prepare release info
         id: release-prepare
         run: |
           current_date=$(TZ=Asia/Shanghai date +'%y%m%d')
@@ -105,10 +106,42 @@ jobs:
           RELEASE_DATE=$(TZ=Asia/Shanghai date '+%Y-%m-%d %H:%M:%S')
           VERSION=$(cat release_assets/version.buildinfo | grep '^r' | head -n 1)
           echo "RELEASE_TITLE=${RELEASE_DATE} - ${VERSION}" >> $GITHUB_OUTPUT
+          image_prefix=LEDE-zzXGPv3-${current_date}${current_time}-
+          echo "IMAGE_PREFIX=${image_prefix}" >> $GITHUB_OUTPUT
+          cat release_header.md > release_info.md
+          echo "" >> release_info.md
+          echo "<details>" >> release_info.md
+          echo "<summary>sha256sums</summary>" >> release_info.md
+          echo "" >> release_info.md
+          echo "\`\`\`" >> release_info.md
+          cat release_assets/sha256sums >> release_info.md
+          echo "\`\`\`" >> release_info.md
+          echo "" >> release_info.md
+          echo "</details>" >> release_info.md
+          echo "<details>" >> release_info.md
+          echo "<summary>LEDE最近提交</summary>" >> release_info.md
+          echo "" >> release_info.md
+          echo "\`\`\`" >> release_info.md
+          cat release_assets/recent_git.log >> release_info.md
+          echo "\`\`\`" >> release_info.md
+          echo "" >> release_info.md
+          echo "</details>" >> release_info.md
+          echo "<details>" >> release_info.md
+          echo "<summary>内置软件包列表</summary>" >> release_info.md
+          echo "" >> release_info.md
+          echo "\`\`\`" >> release_info.md
+          cat release_assets/openwrt-rockchip-armv8-nlnet_xiguapi-v3.manifest >> release_info.md
+          echo "\`\`\`" >> release_info.md
+          echo "" >> release_info.md
+          echo "</details>" >> release_info.md
       - name: Create new tag
         run: |
           git tag ${{ steps.release-prepare.outputs.new_tag }}
           git push origin ${{ steps.release-prepare.outputs.new_tag }}
+      - name: Rename image
+        run: |
+          mv release_assets/openwrt-rockchip-armv8-nlnet_xiguapi-v3-ext4-sysupgrade.img.gz release_assets/${{ steps.release-prepare.outputs.IMAGE_PREFIX }}ext4-sysupgrade.img.gz
+          mv release_assets/openwrt-rockchip-armv8-nlnet_xiguapi-v3-squashfs-sysupgrade.img.gz release_assets/${{ steps.release-prepare.outputs.IMAGE_PREFIX }}squashfs-sysupgrade.img.gz
       - name: Create release
         uses: softprops/action-gh-release@v2
         with:
