@@ -49,5 +49,8 @@ uci set alpha.@navbar[4].icon='/www/luci-static/alpha/zz/icon/navbar/wifi.png'
 uci set alpha.@navbar[4].address='/cgi-bin/luci/admin/network/wireless'
 uci commit alpha
 
+
+uci set system.@system[0].ttylogin=1
+
 # /etc/init.d/zz_xgp_screen enable
 # /etc/init.d/zz_xgp_screen start
