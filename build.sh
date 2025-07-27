@@ -12,6 +12,17 @@ echo "diff initial config and new config:"
 diff ../xgp.config .config
 echo "check device exist"
 grep -Fxq "CONFIG_TARGET_rockchip_armv8_DEVICE_nlnet_xiguapi-v3=y" .config || exit 1
+echo apply qmodem default setting
+cat feeds/qmodem/luci/luci-app-qmodem/root/etc/config/qmodem > files/etc/config/qmodem
+cat >> files/etc/config/qmodem << EOF
+
+config modem-slot 'wwan'
+	option type 'usb'
+	option slot '8-1'
+	option net_led 'blue:net'
+	option alias 'wwan'
+EOF
+
 echo "make download"
 make download -j8 || { echo "download failed"; exit 1; }
 echo "make lede"
