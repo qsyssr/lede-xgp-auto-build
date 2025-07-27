@@ -7,8 +7,8 @@ cat /proc/cpuinfo
 if [ -d "lede" ]; then
     echo "repo dir exists"
     cd lede
+    git reset --hard
     git pull || { echo "git pull failed"; exit 1; }
-    exit 0
 else
     echo "repo dir not exists"
     git clone "https://github.com/coolsnowwolf/lede.git" || { echo "git clone failed"; exit 1; }
@@ -21,6 +21,7 @@ fi
 
 echo "apply diff patch"
 wget -O zzxgp.diff https://github.com/coolsnowwolf/lede/pull/13604.diff
+rm -f target/linux/rockchip/files/arch/arm64/boot/dts/rockchip/rk3568-xiguapi-v3.dts
 git apply zzxgp.diff
 
 cat feeds.conf.default > feeds.conf
