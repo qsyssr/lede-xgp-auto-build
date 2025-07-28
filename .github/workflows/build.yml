@@ -100,9 +100,10 @@ jobs:
         run: |
           current_date=$(TZ=Asia/Shanghai date +'%y%m%d')
           current_time=$(TZ=Asia/Shanghai date +'%H%M%S')
+          new_tag=v0.${current_date}.${current_time}
           echo "current_date=${current_date}" >> $GITHUB_OUTPUT
           echo "current_time=${current_time}" >> $GITHUB_OUTPUT
-          echo "new_tag=v0.${current_date}.${current_time}" >> $GITHUB_OUTPUT
+          echo "new_tag=${new_tag}" >> $GITHUB_OUTPUT
           RELEASE_DATE=$(TZ=Asia/Shanghai date '+%Y-%m-%d %H:%M:%S')
           VERSION=$(cat release_assets/version.buildinfo | grep '^r' | head -n 1)
           echo "RELEASE_TITLE=${RELEASE_DATE} - ${VERSION}" >> $GITHUB_OUTPUT
@@ -110,6 +111,15 @@ jobs:
           echo "IMAGE_PREFIX=${image_prefix}" >> $GITHUB_OUTPUT
           cat release_header.md > release_info.md
           echo "" >> release_info.md
+          PREVIOUS_TAG=$(git describe --tags --abbrev=0 HEAD^ 2>/dev/null || echo "")
+          if [ -n "$PREVIOUS_TAG" ]; then
+              echo "<details>" >> release_info.md
+              echo "<summary>本仓库变更 (${PREVIOUS_TAG}..${new_tag})</summary>" >> release_info.md
+              echo "" >> release_info.md
+              git log --pretty=format:"%h %s" ${PREVIOUS_TAG}..HEAD >> release_info.md
+              echo "" >> release_info.md
+              echo "</details>" >> release_info.md
+          fi
           echo "<details>" >> release_info.md
           echo "<summary>sha256sums</summary>" >> release_info.md
           echo "" >> release_info.md
@@ -119,7 +129,7 @@ jobs:
           echo "" >> release_info.md
           echo "</details>" >> release_info.md
           echo "<details>" >> release_info.md
-          echo "<summary>LEDE最近提交</summary>" >> release_info.md
+          echo "<summary>LEDE最近变更</summary>" >> release_info.md
           echo "" >> release_info.md
           echo "\`\`\`" >> release_info.md
           cat release_assets/recent_git.log >> release_info.md
