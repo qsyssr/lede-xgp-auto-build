@@ -121,14 +121,6 @@ jobs:
               echo "</details>" >> release_info.md
           fi
           echo "<details>" >> release_info.md
-          echo "<summary>sha256sums</summary>" >> release_info.md
-          echo "" >> release_info.md
-          echo "\`\`\`" >> release_info.md
-          cat release_assets/sha256sums >> release_info.md
-          echo "\`\`\`" >> release_info.md
-          echo "" >> release_info.md
-          echo "</details>" >> release_info.md
-          echo "<details>" >> release_info.md
           echo "<summary>LEDE最近变更</summary>" >> release_info.md
           echo "" >> release_info.md
           echo "\`\`\`" >> release_info.md
@@ -141,6 +133,14 @@ jobs:
           echo "" >> release_info.md
           echo "\`\`\`" >> release_info.md
           cat release_assets/openwrt-rockchip-armv8-nlnet_xiguapi-v3.manifest >> release_info.md
+          echo "\`\`\`" >> release_info.md
+          echo "" >> release_info.md
+          echo "</details>" >> release_info.md
+          echo "<details>" >> release_info.md
+          echo "<summary>文件哈希</summary>" >> release_info.md
+          echo "" >> release_info.md
+          echo "\`\`\`" >> release_info.md
+          cat release_assets/sha256sums >> release_info.md
           echo "\`\`\`" >> release_info.md
           echo "" >> release_info.md
           echo "</details>" >> release_info.md
