@@ -21,6 +21,18 @@ config modem-slot 'wwan'
 	option slot '8-1'
 	option net_led 'blue:net'
 	option alias 'wwan'
+
+config modem-slot 'mpcie1'
+	option type 'pcie'
+	option slot '0001:11:00.0'
+	option net_led 'blue:net'
+	option alias 'mpcie1'
+
+config modem-slot 'mpcie2'
+	option type 'pcie'
+	option slot '0002:21:00.0'
+	option net_led 'blue:net'
+	option alias 'mpcie2'
 EOF
 
 echo "make download"
