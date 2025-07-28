@@ -49,10 +49,27 @@ uci set alpha.@navbar[4].icon='/www/luci-static/alpha/zz/icon/navbar/wifi.png'
 uci set alpha.@navbar[4].address='/cgi-bin/luci/admin/network/wireless'
 uci commit alpha
 
-
 uci set system.@system[0].ttylogin=1
 
 # /etc/init.d/zz_xgp_screen enable
 # /etc/init.d/zz_xgp_screen start
+
+uci set qmodem.wwan=modem-slot
+uci set qmodem.wwan.type='usb'
+uci set qmodem.wwan.slot='8-1'
+uci set qmodem.wwan.net_led='blue:net'
+uci set qmodem.wwan.alias='wwan'
+uci set qmodem.mpcie1=modem-slot
+uci set qmodem.mpcie1.type='pcie'
+uci set qmodem.mpcie1.slot='0001:11:00.0'
+uci set qmodem.mpcie1.net_led='blue:net'
+uci set qmodem.mpcie1.alias='mpcie1'
+uci set qmodem.mpcie2=modem-slot
+uci set qmodem.mpcie2.type='pcie'
+uci set qmodem.mpcie2.slot='0002:21:00.0'
+uci set qmodem.mpcie2.net_led='blue:net'
+uci set qmodem.mpcie2.alias='mpcie2'
+uci commit qmodem
+echo "pcie_mhi mhi_mbim_enabled=1" > /etc/modules.d/90-pcie_mhi
 
 sed -i "s/DISTRIB_DESCRIPTION='LEDE '/DISTRIB_DESCRIPTION='LEDE for XGPv3 by zzzz0317 '/" /etc/openwrt_release
