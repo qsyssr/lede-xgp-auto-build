@@ -54,3 +54,5 @@ uci set system.@system[0].ttylogin=1
 
 # /etc/init.d/zz_xgp_screen enable
 # /etc/init.d/zz_xgp_screen start
+
+sed -i "s/DISTRIB_DESCRIPTION='LEDE '/DISTRIB_DESCRIPTION='LEDE for XGPv3 by zzzz0317 '/" /etc/openwrt_release
