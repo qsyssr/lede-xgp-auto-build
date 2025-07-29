@@ -35,6 +35,22 @@ config modem-slot 'mpcie2'
 	option alias 'mpcie2'
 EOF
 
+year=$(date +%y)
+month=$(date +%-m)
+day=$(date +%-d)
+hour=$(date +%-H)
+zz_build_date=$(date "+%Y-%m-%d %H:%M:%S %z")
+zz_build_uuid=$(uuidgen)
+echo "zz_build_date=${zz_build_date}"
+echo "zz_build_uuid=${zz_build_uuid}"
+cat >> files/etc/uci-defaults/zzzz-version << EOF
+echo "DISTRIB_REVISION='R${year}.${month}.${day}.${hour}'" >> /etc/openwrt_release
+echo "ZZ_BUILD_ID='${zz_build_uuid}'" > /etc/zz_build_id
+echo "ZZ_BUILD_HOST='$(hostname)'" >> /etc/zz_build_id
+echo "ZZ_BUILD_USER='$(whoami)'" >> /etc/zz_build_id
+echo "ZZ_BUILD_DATE='${zz_build_date}'" >> /etc/zz_build_id
+EOF
+
 echo "make download"
 make download -j8 || { echo "download failed"; exit 1; }
 echo "make lede"
