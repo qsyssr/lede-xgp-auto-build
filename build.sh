@@ -49,6 +49,7 @@ echo "ZZ_BUILD_ID='${zz_build_uuid}'" > /etc/zz_build_id
 echo "ZZ_BUILD_HOST='$(hostname)'" >> /etc/zz_build_id
 echo "ZZ_BUILD_USER='$(whoami)'" >> /etc/zz_build_id
 echo "ZZ_BUILD_DATE='${zz_build_date}'" >> /etc/zz_build_id
+/bin/sync
 EOF
 
 echo "make download"
