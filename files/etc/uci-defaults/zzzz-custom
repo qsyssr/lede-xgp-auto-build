@@ -6,7 +6,10 @@ uci set system.@system[0].hostname='zzXGP'
 uci commit system
 uci del dhcp.lan.ra_slaac
 uci set network.lan.ipaddr='10.0.0.1'
-uci add_list network.lan.ip6class='8_1v6'
+uci add_list network.lan.ip6class='mpcie1v6'
+uci add_list network.lan.ip6class='mpcie2v6'
+uci add_list network.lan.ip6class='wwanv6'
+uci add_list network.lan.ip6class='wan6'
 uci set luci.main.lang='zh_cn'
 uci set luci.main.mediaurlbase='/luci-static/argon'
 #uci set cpufreq.global.set='1'
