@@ -4,8 +4,9 @@
 
 ## 已知问题
 
-1. 外置USB端口连接存储设备时，系统更新似乎会写入到外置存储设备而非NAND，但无法从外置存储设备启动，似乎是所有固件的通病？（2025-07-17新版本已修复）
-2. [d5f64b32999fb68b7d23c03f08b7d2f52cdfacfc](https://github.com/coolsnowwolf/lede/commit/d5f64b32999fb68b7d23c03f08b7d2f52cdfacfc) 这个commit消失了，目前正在重新提交[#13604](https://github.com/coolsnowwolf/lede/pull/13604)，当前使用作者自行维护的分支[xgp-20250713](https://github.com/zzzz0317/lede/tree/xgp-20250713)编译。
+1. ~~外置USB端口连接存储设备时，系统更新似乎会写入到外置存储设备而非NAND，但无法从外置存储设备启动，似乎是所有固件的通病？~~（2025-07-17新版本已修复）
+2. [d5f64b32999fb68b7d23c03f08b7d2f52cdfacfc](https://github.com/coolsnowwolf/lede/commit/d5f64b32999fb68b7d23c03f08b7d2f52cdfacfc) 这个commit消失了，目前正在重新提交[#13604](https://github.com/coolsnowwolf/lede/pull/13604)，当前编译时会自动使用 `git apply` 应用这个 [diff](https://github.com/coolsnowwolf/lede/pull/13604.diff) 文件。
+3. 通过转接板连接的 PCIe 5G 模块在刷机后需要断电（直接拔DC插头，拔市电那头要多等几秒电容放电）一次，否则大概率找不到模块，转接板硬件原因导致模块在重启时不能正常下电。
 
 ## 说明
 
@@ -14,6 +15,19 @@
 3. 默认 Wi-Fi SSID: `zzXGP`，密码: `xgpxgpxgp`
 4. 默认 LAN 接口地址: `10.0.0.1`
 5. 默认 root 密码: `password`，后续可能会变更
+6. 使用 PCIe 模块在刷机后建议断一次电
+
+本固件目前的用途：
+
+1. 合进LEDE主线，让所有人更容易的编译
+2. 测试模块兼容性
+3. 收集建议添加新软件包
+
+未来规划：
+
+1. 周更，每周使用最新LEDE代码编译
+2. 自建软件仓库
+3. 尝试其他OpenWRT分支
 
 ## 截图
 
