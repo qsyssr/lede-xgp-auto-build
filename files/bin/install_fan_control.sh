@@ -1345,3 +1345,7 @@ echo "----------------------------------------------"
 echo " 访问路径: LuCI -> 状态 -> 硬件监控"
 echo "=============================================="
 echo " Powered by UnderTheSun"
+
+echo "Write all buffered blocks to disk..."
+sync
+echo "Done!"
