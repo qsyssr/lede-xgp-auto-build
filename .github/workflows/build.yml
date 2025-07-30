@@ -150,7 +150,6 @@ jobs:
           git push origin ${{ steps.release-prepare.outputs.new_tag }}
       - name: Rename image
         run: |
-          mv release_assets/openwrt-rockchip-armv8-nlnet_xiguapi-v3-ext4-sysupgrade.img.gz release_assets/${{ steps.release-prepare.outputs.IMAGE_PREFIX }}ext4-sysupgrade.img.gz
           mv release_assets/openwrt-rockchip-armv8-nlnet_xiguapi-v3-squashfs-sysupgrade.img.gz release_assets/${{ steps.release-prepare.outputs.IMAGE_PREFIX }}squashfs-sysupgrade.img.gz
       - name: Create release
         uses: softprops/action-gh-release@v2
