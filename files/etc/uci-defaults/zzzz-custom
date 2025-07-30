@@ -75,4 +75,3 @@ uci set qmodem.mpcie2.alias='mpcie2'
 uci commit qmodem
 echo "pcie_mhi mhi_mbim_enabled=1" > /etc/modules.d/90-pcie_mhi
 
-sed -i "s/DISTRIB_DESCRIPTION='LEDE '/DISTRIB_DESCRIPTION='LEDE for XGPv3 by zzzz0317 '/" /etc/openwrt_release

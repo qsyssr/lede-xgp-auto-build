@@ -45,12 +45,12 @@ echo "zz_build_date=${zz_build_date}"
 echo "zz_build_uuid=${zz_build_uuid}"
 cat >> files/etc/uci-defaults/zzzz-version << EOF
 echo "DISTRIB_REVISION='R${year}.${month}.${day}.${hour}'" >> /etc/openwrt_release
-echo "ZZ_BUILD_ID='${zz_build_uuid}'" > /etc/zz_build_id
-echo "ZZ_BUILD_HOST='$(hostname)'" >> /etc/zz_build_id
-echo "ZZ_BUILD_USER='$(whoami)'" >> /etc/zz_build_id
-echo "ZZ_BUILD_DATE='${zz_build_date}'" >> /etc/zz_build_id
 /bin/sync
 EOF
+echo "ZZ_BUILD_ID='${zz_build_uuid}'" > files/etc/zz_build_id
+echo "ZZ_BUILD_HOST='$(hostname)'" >> files/etc/zz_build_id
+echo "ZZ_BUILD_USER='$(whoami)'" >> files/etc/zz_build_id
+echo "ZZ_BUILD_DATE='${zz_build_date}'" >> files/etc/zz_build_id
 
 echo "make download"
 make download -j8 || { echo "download failed"; exit 1; }
