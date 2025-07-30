@@ -17,6 +17,8 @@ on:
 jobs:
   build:
     runs-on: ubuntu-24.04
+    env:
+      TZ: Asia/Shanghai
     steps:
       - name: Check build space
         run: |
@@ -81,6 +83,8 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
+    env:
+      TZ: Asia/Shanghai
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -98,13 +102,13 @@ jobs:
       - name: Prepare release info
         id: release-prepare
         run: |
-          current_date=$(TZ=Asia/Shanghai date +'%y%m%d')
-          current_time=$(TZ=Asia/Shanghai date +'%H%M%S')
+          current_date=$(date +'%y%m%d')
+          current_time=$(date +'%H%M%S')
           new_tag=v0.${current_date}.${current_time}
           echo "current_date=${current_date}" >> $GITHUB_OUTPUT
           echo "current_time=${current_time}" >> $GITHUB_OUTPUT
           echo "new_tag=${new_tag}" >> $GITHUB_OUTPUT
-          RELEASE_DATE=$(TZ=Asia/Shanghai date '+%Y-%m-%d %H:%M:%S')
+          RELEASE_DATE=$(date '+%Y-%m-%d %H:%M:%S')
           VERSION=$(cat release_assets/version.buildinfo | grep '^r' | head -n 1)
           echo "RELEASE_TITLE=${RELEASE_DATE} - ${VERSION}" >> $GITHUB_OUTPUT
           image_prefix=LEDE-zzXGPv3-${current_date}${current_time}-
