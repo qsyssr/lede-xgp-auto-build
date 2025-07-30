@@ -41,6 +41,7 @@ day=$(date +%-d)
 hour=$(date +%-H)
 zz_build_date=$(date "+%Y-%m-%d %H:%M:%S %z")
 zz_build_uuid=$(uuidgen)
+
 echo "zz_build_date=${zz_build_date}"
 echo "zz_build_uuid=${zz_build_uuid}"
 cat >> files/etc/uci-defaults/zzzz-version << EOF
@@ -51,7 +52,8 @@ echo "ZZ_BUILD_ID='${zz_build_uuid}'" > files/etc/zz_build_id
 echo "ZZ_BUILD_HOST='$(hostname)'" >> files/etc/zz_build_id
 echo "ZZ_BUILD_USER='$(whoami)'" >> files/etc/zz_build_id
 echo "ZZ_BUILD_DATE='${zz_build_date}'" >> files/etc/zz_build_id
-
+echo "ZZ_BUILD_REPO_HASH='$(cd .. && git rev-parse HEAD)'" >> files/etc/zz_build_id
+echo "ZZ_BUILD_LEDE_HASH='$(git rev-parse HEAD)'" >> files/etc/zz_build_id
 echo "make download"
 make download -j8 || { echo "download failed"; exit 1; }
 echo "make lede"
