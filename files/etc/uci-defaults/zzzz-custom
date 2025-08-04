@@ -33,6 +33,10 @@ uci set wireless.default_radio1.key='xgpxgpxgp'
 uci commit wireless
 /etc/init.d/network reload
 wifi
+uci set argon.@global[0].mode='dark'
+uci set argon.@global[0].online_wallpaper='none'
+uci set argon.@global[0].transparency_dark='0.3'
+uci commit argon
 uci -q set zz_config.@status[0].first_boot=0
 uci commit zz_config
 fi

@@ -29,6 +29,13 @@ echo "" >> feeds.conf
 echo "src-git qmodem https://github.com/FUjr/QModem.git;main" >> feeds.conf
 rm -rf files
 cp -r ../files .
+if [ -d "package/zz/luci-app-argon-config" ]; then
+    cd package/zz/luci-app-argon-config
+    git pull || { echo "luci-app-argon-config git pull failed"; exit 1; }
+    cd ../../..
+else
+    git clone https://github.com/jerrykuku/luci-app-argon-config.git package/zz/luci-app-argon-config || { echo "luci-app-argon-config git clone failed"; exit 1; }
+fi
 if [ -d "package/zz/luci-theme-alpha" ]; then
     cd package/zz/luci-theme-alpha
     git pull || { echo "luci-theme-alpha git pull failed"; exit 1; }
