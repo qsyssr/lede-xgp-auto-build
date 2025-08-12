@@ -26,7 +26,8 @@ git apply zzxgp.diff
 
 cat feeds.conf.default > feeds.conf
 echo "" >> feeds.conf
-echo "src-git qmodem https://github.com/FUjr/QModem.git;main" >> feeds.conf
+#echo "src-git qmodem https://github.com/FUjr/QModem.git;v2.8.3" >> feeds.conf
+echo "src-git qmodem https://github.com/zzzz0317/QModem.git;stable202507" >> feeds.conf
 rm -rf files
 cp -r ../files .
 if [ -d "package/zz/luci-app-argon-config" ]; then
