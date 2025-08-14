@@ -1,14 +1,4 @@
-# 注意，又改了DTS，作者自测通过，没广泛测试
-
-修改DTS的提交 -> https://github.com/coolsnowwolf/lede/pull/13604/commits/8e054e6759ff4c1e4f5cfe286c7826a7de3694e3
-
-自测工作正常组合：
-
-| 序号 | M.2 WiFi | M.2 5G | mPCIe 1 | mPCIe 2 |
-|------|----------|--------|---------|---------|
-| 1 | 空 | RM500Q-GL | MT7916 | 空 |
-| 2 | MT7922 | RM500Q-GL | T99W373 | MT7916 |
-| 3 | 空 | 空 | MT7916 | T99W373 |
+对西瓜皮V3支持的变更已合并至 LEDE [8547db9c](https://github.com/coolsnowwolf/lede/commit/8547db9c25d697d9d966f8f8e91c6a74066ff243)
 
 第一次使用前请先阅读 [README.md](https://github.com/zzzz0317/lede-xgp-auto-build/blob/main/README.md)
 
