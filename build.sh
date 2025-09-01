@@ -13,7 +13,8 @@ diff ../xgp.config .config
 echo "check device exist"
 grep -Fxq "CONFIG_TARGET_rockchip_armv8_DEVICE_nlnet_xiguapi-v3=y" .config || exit 1
 echo apply qmodem default setting
-cat feeds/qmodem/luci/luci-app-qmodem/root/etc/config/qmodem > files/etc/config/qmodem
+#cat feeds/qmodem/luci/luci-app-qmodem/root/etc/config/qmodem > files/etc/config/qmodem
+cat feeds/qmodem/application/qmodem/files/etc/config/qmodem > files/etc/config/qmodem
 cat >> files/etc/config/qmodem << EOF
 
 config modem-slot 'wwan'
