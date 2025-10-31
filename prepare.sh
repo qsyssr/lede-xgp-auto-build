@@ -109,7 +109,7 @@ rm -rf package/luci-app-easytier
 git clone https://github.com/EasyTier/luci-app-easytier.git package/luci-app-easytier
 
 rm -rf package/luci-app-tailscale
-git clone https://github.com/zzsj0928/luci-app-tailscale.git package/luci-app-tailscale
+git clone https://github.com/asvow/luci-app-tailscale.git package/luci-app-tailscale
 
 echo "==== 🧾 Add runtime opkg sources ===="
 
