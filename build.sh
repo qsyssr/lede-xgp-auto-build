@@ -10,6 +10,10 @@ echo "make defconfig"
 make defconfig || { echo "defconfig failed"; exit 1; }
 echo "diff initial config and new config:"
 diff ../xgp.config .config
+echo "diff initial config and new config (from old config only):"
+diff ../xgp.config .config | grep -e "^<" | grep -v "^< #"
+echo "diff initial config and new config (from new config only):"
+diff ../xgp.config .config | grep -e "^>" | grep -v "^> #"
 echo "check device exist"
 grep -Fxq "CONFIG_TARGET_rockchip_armv8_DEVICE_nlnet_xiguapi-v3=y" .config || exit 1
 echo apply qmodem default setting
