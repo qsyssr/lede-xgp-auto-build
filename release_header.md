@@ -4,4 +4,6 @@
 
 通过转接板连接的 PCIe 5G 模块在刷机后需要断电（直接拔DC插头，拔市电那头要多等几秒电容放电）一次，否则大概率找不到模块，转接板硬件原因导致模块在重启时不能正常下电。
 
-QModem 已更新至 v2.8.8 [8c22b3c6f0b276451f6458991405e19ca502219d](https://github.com/zzzz0317/QModem/tree/stable202508)
+QModem 现已同步 main 分支更新
+
+MBIM 模式若无法正常拨号请在 QWRT模组管理 -> 拨号总览 -> 模组配置 -> 高级设置 中指定 APN，详见 [QModem Issues #129](https://github.com/FUjr/QModem/issues/129)

@@ -17,8 +17,8 @@ fi
 
 cat feeds.conf.default > feeds.conf
 echo "" >> feeds.conf
-#echo "src-git qmodem https://github.com/FUjr/QModem.git;main" >> feeds.conf
-echo "src-git qmodem https://github.com/zzzz0317/QModem.git;stable202508" >> feeds.conf
+echo "src-git qmodem https://github.com/FUjr/QModem.git;main" >> feeds.conf
+#echo "src-git qmodem https://github.com/zzzz0317/QModem.git;stable202508" >> feeds.conf
 rm -rf files
 cp -r ../files .
 if [ -d "package/zz/luci-app-argon-config" ]; then
