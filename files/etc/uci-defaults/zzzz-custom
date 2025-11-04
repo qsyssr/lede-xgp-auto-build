@@ -20,6 +20,7 @@ uci set luci.main.mediaurlbase='/luci-static/argon'
 #uci set luci-fan.@luci-fan[0].off_temp='10'
 #uci set luci-fan.@luci-fan[0].on_temp='25'
 uci set qmodem.main.at_tool='1'
+uci set qmodem.main.start_delay='15'
 uci set qmodem.main.enable_pcie_scan='1'
 uci set qmodem.main.enable_usb_scan='1'
 uci commit
