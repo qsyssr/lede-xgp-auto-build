@@ -4,6 +4,10 @@ echo "update feeds"
 ./scripts/feeds update -a || { echo "update feeds failed"; exit 1; }
 echo "install feeds"
 ./scripts/feeds install -a || { echo "install feeds failed"; exit 1; }
+# 安装 smpackage feed 包
+echo "install smpackage feed packages"
+./scripts/feeds update smpackage || echo "warning: smpackage feed update failed"
+./scripts/feeds install -a -p smpackage || echo "warning: smpackage feed install failed"
 ./scripts/feeds install -a -f -p qmodem || { echo "install qmodem feeds failed"; exit 1; }
 cat ../xgp.config > .config
 echo "make defconfig"
