@@ -17,15 +17,17 @@ fi
 
 cat feeds.conf.default > feeds.conf
 echo "" >> feeds.conf
-echo "src-git qmodem https://github.com/FUjr/QModem.git;main" >> feeds.conf
-#echo "src-git qmodem https://github.com/zzzz0317/QModem.git;stable202508" >> feeds.conf
-# 添加 smpackage 源（如果不存在）
-if ! grep -q "smpackage" feeds.conf.default; then
+# === feeds 配置 ===
+cp feeds.conf.default feeds.conf
+# 加入 smpackage feed
+if ! grep -q "src-git smpackage" feeds.conf.default; then
   echo "Adding smpackage feed..."
   sed -i '$a src-git smpackage https://github.com/kenzok8/small-package' feeds.conf.default
 else
-  echo "smpackage feed already exists."
+  echo "smpackage feed already present"
 fi
+echo "src-git qmodem https://github.com/FUjr/QModem.git;main" >> feeds.conf
+#echo "src-git qmodem https://github.com/zzzz0317/QModem.git;stable202508" >> feeds.conf
 rm -rf files
 cp -r ../files .
 if [ -d "package/zz/luci-app-argon-config" ]; then
