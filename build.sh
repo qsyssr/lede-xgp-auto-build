@@ -4,18 +4,8 @@ echo "update feeds"
 ./scripts/feeds update -a || { echo "update feeds failed"; exit 1; }
 echo "install feeds"
 ./scripts/feeds install -a || { echo "install feeds failed"; exit 1; }
-# 安装 smpackage feed 包
-echo "install smpackage feed packages"
-./scripts/feeds update smpackage || echo "warning: smpackage feed update failed"
-./scripts/feeds install -a -p smpackage || echo "warning: smpackage feed install failed"
 ./scripts/feeds install -a -f -p qmodem || { echo "install qmodem feeds failed"; exit 1; }
 cat ../xgp.config > .config
-# 确保插件启用
-for pkg in tailscale easytier lucky; do
-  if ! grep -q "CONFIG_PACKAGE_${pkg}=y" .config; then
-    echo "CONFIG_PACKAGE_${pkg}=y" >> .config
-  fi
-done
 echo "make defconfig"
 make defconfig || { echo "defconfig failed"; exit 1; }
 echo "diff initial config and new config:"
