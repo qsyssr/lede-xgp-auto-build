@@ -30,12 +30,6 @@ echo "src-git qmodem https://github.com/FUjr/QModem.git;main" >> feeds.conf
 #echo "src-git qmodem https://github.com/zzzz0317/QModem.git;stable202508" >> feeds.conf
 rm -rf files
 cp -r ../files .
-# === 替换 dns2socks ===
-echo "[prepare] replacing dns2socks with small-package version..."
-rm -rf feeds/packages/net/dns2socks || true
-git clone --depth 1 https://github.com/kenzok8/small-package.git tmp_smp
-cp -r tmp_smp/dns2socks feeds/packages/net/
-rm -rf tmp_smp
 if [ -d "package/zz/luci-app-argon-config" ]; then
     cd package/zz/luci-app-argon-config
     git pull || { echo "luci-app-argon-config git pull failed"; exit 1; }
