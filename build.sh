@@ -3,6 +3,23 @@ cd lede
 echo "update feeds"
 ./scripts/feeds update -a || { echo "update feeds failed"; exit 1; }
 echo "install feeds"
+# --- 替换 dns2socks 为 small-package 的更稳定实现 ---
+echo "[build] replacing feeds/packages/net/dns2socks with small-package version (if exists)"
+# remove old if present
+rm -rf feeds/packages/net/dns2socks || true
+
+# fetch small-package 临时仓库并拷贝 dns2socks 目录
+git clone --depth 1 https://github.com/kenzok8/small-package.git tmp_smp || {
+  echo "[build] warning: failed to clone small-package; continuing"
+}
+if [ -d "tmp_smp/dns2socks" ]; then
+  mkdir -p feeds/packages/net
+  cp -r tmp_smp/dns2socks feeds/packages/net/
+  echo "[build] dns2socks replaced from small-package"
+else
+  echo "[build] tmp_smp/dns2socks not found; skipping replacement"
+fi
+rm -rf tmp_smp
 ./scripts/feeds install -a || { echo "install feeds failed"; exit 1; }
 # force update/install smpackage feed and list what is installed
 ./scripts/feeds update smpackage || echo "warning: update smpackage failed"
