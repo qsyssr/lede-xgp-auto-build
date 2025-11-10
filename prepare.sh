@@ -58,3 +58,8 @@ if [ -d "package/zz/xgp-v3-screen" ]; then
 else
     git clone https://github.com/zzzz0317/xgp-v3-screen.git package/zz/xgp-v3-screen || { echo "xgp-v3-screen git clone failed"; exit 1; }
 fi
+# 替换 dns2socks 为 small-package 的版本
+rm -rf feeds/packages/net/dns2socks
+git clone https://github.com/kenzok8/small-package.git tmp_smp
+cp -r tmp_smp/dns2socks feeds/packages/net/
+rm -rf tmp_smp
