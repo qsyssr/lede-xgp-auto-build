@@ -4,11 +4,7 @@ echo "update feeds"
 ./scripts/feeds update -a || { echo "update feeds failed"; exit 1; }
 echo "install feeds"
 ./scripts/feeds install -a || { echo "install feeds failed"; exit 1; }
-# force update/install smpackage feed and list what is installed
-./scripts/feeds update smpackage || echo "warning: update smpackage failed"
-./scripts/feeds install -a -p smpackage || echo "warning: install smpackage failed"
-echo "Installed smpackage packages:"
-./scripts/feeds list | grep smpackage -A10 || true
+./scripts/feeds install -a -f -p smpackage || { echo "install smpackage feeds failed"; exit 1; }
 ./scripts/feeds install -a -f -p qmodem || { echo "install qmodem feeds failed"; exit 1; }
 cat ../xgp.config > .config
 echo "make defconfig"
