@@ -11,29 +11,6 @@ echo "Installed smpackage packages:"
 ./scripts/feeds list | grep smpackage -A10 || true
 ./scripts/feeds install -a -f -p qmodem || { echo "install qmodem feeds failed"; exit 1; }
 cat ../xgp.config > .config
-# After .config exists (from xgp.config), detect actual package names and enable them
-enable_pkg_if_exists(){
-  local want="$1"     # human-name hint (tailscale,easytier,lucky)
-  # find matching package dir under feeds/smpackage or package/* (installed by feeds install)
-  pkg_dir="$(find package feeds -maxdepth 3 -type d -iname "*${want}*" | head -n1 || true)"
-  if [ -n "$pkg_dir" ]; then
-    # package directory's basename is the actual package name
-    pkg_name="$(basename "$pkg_dir")"
-    cfg="CONFIG_PACKAGE_${pkg_name}"
-    if ! grep -q "^${cfg}=y" .config; then
-      echo "${cfg}=y" >> .config
-      echo "Enabled ${cfg} (from ${pkg_dir})"
-    else
-      echo "${cfg} already set"
-    fi
-  else
-    echo "Warning: no package dir found matching '${want}' in package/ or feeds/ (smpackage?)"
-  fi
-}
-
-enable_pkg_if_exists "tailscale"
-enable_pkg_if_exists "easytier"
-enable_pkg_if_exists "lucky"
 echo "make defconfig"
 make defconfig || { echo "defconfig failed"; exit 1; }
 echo "diff initial config and new config:"
@@ -88,6 +65,25 @@ echo "ZZ_BUILD_DATE='${zz_build_date}'" >> files/etc/zz_build_id
 echo "ZZ_BUILD_REPO_HASH='$(cd .. && git rev-parse HEAD)'" >> files/etc/zz_build_id
 echo "ZZ_BUILD_LEDE_HASH='$(git rev-parse HEAD)'" >> files/etc/zz_build_id
 echo "make download"
+# === 自动启用三插件 ===
+enable_pkg_if_exists() {
+  local want="$1"
+  pkg_dir="$(find package feeds -maxdepth 3 -type d -iname "*${want}*" | head -n1 || true)"
+  if [ -n "$pkg_dir" ]; then
+    pkg_name="$(basename "$pkg_dir")"
+    cfg="CONFIG_PACKAGE_${pkg_name}"
+    if ! grep -q "^${cfg}=y" .config; then
+      echo "${cfg}=y" >> .config
+      echo "[build] enabled ${cfg} (${pkg_dir})"
+    fi
+  else
+    echo "[build] warn: package ${want} not found"
+  fi
+}
+
+enable_pkg_if_exists "tailscale"
+enable_pkg_if_exists "easytier"
+enable_pkg_if_exists "lucky"
 make download -j8 || { echo "download failed"; exit 1; }
 echo "make lede"
 make V=0 -j$(nproc) || { echo "make failed"; exit 1; }
