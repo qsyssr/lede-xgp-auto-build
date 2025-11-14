@@ -1,73 +1,93 @@
-#!/usr/bin/env bash
-set -euo pipefail
-
-SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
-cd "$SCRIPT_DIR"
-
-[ -d "lede" ] || { echo "lede dir not found, run prepare.sh first."; exit 1; }
+#!/bin/bash
 cd lede
-
-# === 更新 feeds ===
-echo "[build] updating feeds..."
-./scripts/feeds clean
+echo "update feeds"
 ./scripts/feeds update -a || { echo "update feeds failed"; exit 1; }
-
-# === 替换 dns2socks ===
-echo "[build] replacing feeds/packages/net/dns2socks with small-package version..."
-rm -rf feeds/packages/net/dns2socks || true
-git clone --depth 1 https://github.com/kenzok8/small-package.git tmp_smp || {
-  echo "[build] warning: clone small-package failed"
-}
-if [ -d "tmp_smp/dns2socks" ]; then
-  mkdir -p feeds/packages/net
-  cp -r tmp_smp/dns2socks feeds/packages/net/
-  echo "[build] dns2socks replaced from small-package"
-else
-  echo "[build] tmp_smp/dns2socks not found; skipping replacement"
-fi
-rm -rf tmp_smp
-
-# === 安装 feeds ===
-echo "[build] installing feeds..."
+echo "install feeds"
 ./scripts/feeds install -a || { echo "install feeds failed"; exit 1; }
-./scripts/feeds install -a -p smpackage || echo "[build] warning: smpackage install failed"
-./scripts/feeds install -a -p qmodem || echo "[build] warning: qmodem install failed"
-
-# === 配置文件 ===
-if [ -f ../xgp.config ]; then
-  cp ../xgp.config .config
-else
-  echo "[build] xgp.config missing"; exit 1
-fi
-
-make defconfig
-
-# === 自动启用三插件 ===
-enable_pkg_if_exists() {
-  local want="$1"
+# force update/install smpackage feed and list what is installed
+./scripts/feeds update smpackage || echo "warning: update smpackage failed"
+./scripts/feeds install -a -p smpackage || echo "warning: install smpackage failed"
+echo "Installed smpackage packages:"
+./scripts/feeds list | grep smpackage -A10 || true
+./scripts/feeds install -a -f -p qmodem || { echo "install qmodem feeds failed"; exit 1; }
+cat ../xgp.config > .config
+# After .config exists (from xgp.config), detect actual package names and enable them
+enable_pkg_if_exists(){
+  local want="$1"     # human-name hint (tailscale,easytier,lucky)
+  # find matching package dir under feeds/smpackage or package/* (installed by feeds install)
   pkg_dir="$(find package feeds -maxdepth 3 -type d -iname "*${want}*" | head -n1 || true)"
   if [ -n "$pkg_dir" ]; then
+    # package directory's basename is the actual package name
     pkg_name="$(basename "$pkg_dir")"
     cfg="CONFIG_PACKAGE_${pkg_name}"
     if ! grep -q "^${cfg}=y" .config; then
       echo "${cfg}=y" >> .config
-      echo "[build] enabled ${cfg} (${pkg_dir})"
+      echo "Enabled ${cfg} (from ${pkg_dir})"
+    else
+      echo "${cfg} already set"
     fi
   else
-    echo "[build] warn: package ${want} not found"
+    echo "Warning: no package dir found matching '${want}' in package/ or feeds/ (smpackage?)"
   fi
 }
 
 enable_pkg_if_exists "tailscale"
 enable_pkg_if_exists "easytier"
 enable_pkg_if_exists "lucky"
+echo "make defconfig"
+make defconfig || { echo "defconfig failed"; exit 1; }
+echo "diff initial config and new config:"
+diff ../xgp.config .config
+echo "diff initial config and new config (from old config only):"
+diff ../xgp.config .config | grep -e "^<" | grep -v "^< #"
+echo "diff initial config and new config (from new config only):"
+diff ../xgp.config .config | grep -e "^>" | grep -v "^> #"
+echo "check device exist"
+grep -Fxq "CONFIG_TARGET_rockchip_armv8_DEVICE_nlnet_xiguapi-v3=y" .config || exit 1
+echo apply qmodem default setting
+#cat feeds/qmodem/luci/luci-app-qmodem/root/etc/config/qmodem > files/etc/config/qmodem
+cat feeds/qmodem/application/qmodem/files/etc/config/qmodem > files/etc/config/qmodem
+cat >> files/etc/config/qmodem << EOF
 
-# === 编译 ===
-echo "[build] downloading sources..."
-make download -j8 || echo "[build] warning: make download failed"
+config modem-slot 'wwan'
+	option type 'usb'
+	option slot '8-1'
+	option net_led 'blue:net'
+	option alias 'wwan'
 
-JOBS=${JOBS:-2}
-echo "[build] compiling with ${JOBS} threads..."
-make -j"${JOBS}" V=s || make -j1 V=s
+config modem-slot 'mpcie1'
+	option type 'pcie'
+	option slot '0001:11:00.0'
+	option net_led 'blue:net'
+	option alias 'mpcie1'
 
-echo "[build] finished successfully."
+config modem-slot 'mpcie2'
+	option type 'pcie'
+	option slot '0002:21:00.0'
+	option net_led 'blue:net'
+	option alias 'mpcie2'
+EOF
+
+year=$(date +%y)
+month=$(date +%-m)
+day=$(date +%-d)
+hour=$(date +%-H)
+zz_build_date=$(date "+%Y-%m-%d %H:%M:%S %z")
+zz_build_uuid=$(uuidgen)
+
+echo "zz_build_date=${zz_build_date}"
+echo "zz_build_uuid=${zz_build_uuid}"
+cat >> files/etc/uci-defaults/zzzz-version << EOF
+echo "DISTRIB_REVISION='R${year}.${month}.${day}.${hour}'" >> /etc/openwrt_release
+/bin/sync
+EOF
+echo "ZZ_BUILD_ID='${zz_build_uuid}'" > files/etc/zz_build_id
+echo "ZZ_BUILD_HOST='$(hostname)'" >> files/etc/zz_build_id
+echo "ZZ_BUILD_USER='$(whoami)'" >> files/etc/zz_build_id
+echo "ZZ_BUILD_DATE='${zz_build_date}'" >> files/etc/zz_build_id
+echo "ZZ_BUILD_REPO_HASH='$(cd .. && git rev-parse HEAD)'" >> files/etc/zz_build_id
+echo "ZZ_BUILD_LEDE_HASH='$(git rev-parse HEAD)'" >> files/etc/zz_build_id
+echo "make download"
+make download -j8 || { echo "download failed"; exit 1; }
+echo "make lede"
+make V=0 -j$(nproc) || { echo "make failed"; exit 1; }
