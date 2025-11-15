@@ -1,15 +1,23 @@
 #!/bin/bash
-cd lede
-echo "update feeds"
-./scripts/feeds update -a || { echo "update feeds failed"; exit 1; }
-echo "install feeds"
-./scripts/feeds install -a || { echo "install feeds failed"; exit 1; }
-./scripts/feeds install -a -f -p smpackage || { echo "install smpackage feeds failed"; exit 1; }
-./scripts/feeds install -a -f -p qmodem || { echo "install qmodem feeds failed"; exit 1; }
-cat ../xgp.config > .config
-echo "make defconfig"
-make defconfig || { echo "defconfig failed"; exit 1; }
-# === 自动启用三插件 ===
+set -e
+
+cd lede || { echo "[ERROR] Cannot enter lede directory"; exit 1; }
+
+log() { echo -e "\033[1;32m[build]\033[0m $*"; }
+err() { echo -e "\033[1;31m[ERROR]\033[0m $*"; exit 1; }
+
+log "Update feeds"
+./scripts/feeds update -a || err "Update feeds failed"
+log "Install feeds"
+./scripts/feeds install -a || err "Install feeds failed"
+./scripts/feeds install -a -f -p smpackage || err "Install smpackage feeds failed"
+./scripts/feeds install -a -f -p qmodem || err "Install qmodem feeds failed"
+
+cp -f ../xgp.config .config || err "Copy config failed"
+
+log "Run make defconfig"
+make defconfig || err "defconfig failed"
+
 enable_pkg_if_exists() {
   local want="$1"
   pkg_dir="$(find package feeds -maxdepth 3 -type d -iname "*${want}*" | head -n1 || true)"
@@ -18,27 +26,30 @@ enable_pkg_if_exists() {
     cfg="CONFIG_PACKAGE_${pkg_name}"
     if ! grep -q "^${cfg}=y" .config; then
       echo "${cfg}=y" >> .config
-      echo "[build] enabled ${cfg} (${pkg_dir})"
+      log "Enabled ${cfg} (${pkg_dir})"
     fi
   else
-    echo "[build] warn: package ${want} not found"
+    log "warn: package ${want} not found"
   fi
 }
 
-enable_pkg_if_exists "tailscale"
-enable_pkg_if_exists "easytier"
-enable_pkg_if_exists "lucky"
+# 自动启用插件
+for pkg in tailscale easytier lucky; do
+  enable_pkg_if_exists "$pkg"
+done
 
-echo "diff initial config and new config:"
-diff ../xgp.config .config
-echo "diff initial config and new config (from old config only):"
-diff ../xgp.config .config | grep -e "^<" | grep -v "^< #"
-echo "diff initial config and new config (from new config only):"
-diff ../xgp.config .config | grep -e "^>" | grep -v "^> #"
-echo "check device exist"
-grep -Fxq "CONFIG_TARGET_rockchip_armv8_DEVICE_nlnet_xiguapi-v3=y" .config || exit 1
-echo apply qmodem default setting
-#cat feeds/qmodem/luci/luci-app-qmodem/root/etc/config/qmodem > files/etc/config/qmodem
+log "Diff initial config and new config:"
+diff ../xgp.config .config || true
+log "Diff from old config only:"
+diff ../xgp.config .config | grep -e "^<" | grep -v "^< #" || true
+log "Diff from new config only:"
+diff ../xgp.config .config | grep -e "^>" | grep -v "^> #" || true
+
+log "Check device config"
+grep -Fxq "CONFIG_TARGET_rockchip_armv8_DEVICE_nlnet_xiguapi-v3=y" .config || err "Device config missing"
+
+log "Apply qmodem default setting"
+mkdir -p files/etc/config
 cat feeds/qmodem/application/qmodem/files/etc/config/qmodem > files/etc/config/qmodem
 cat >> files/etc/config/qmodem << EOF
 
@@ -61,45 +72,36 @@ config modem-slot 'mpcie2'
 	option alias 'mpcie2'
 EOF
 
+# 版本信息生成
 year=$(date +%y)
 month=$(date +%-m)
 day=$(date +%-d)
 hour=$(date +%-H)
 zz_build_date=$(date "+%Y-%m-%d %H:%M:%S %z")
 zz_build_uuid=$(uuidgen)
+build_id_path=files/etc/zz_build_id
 
-echo "zz_build_date=${zz_build_date}"
-echo "zz_build_uuid=${zz_build_uuid}"
-cat >> files/etc/uci-defaults/zzzz-version << EOF
+log "Generate build version"
+mkdir -p files/etc/uci-defaults
+cat > files/etc/uci-defaults/zzzz-version << EOF
 echo "DISTRIB_REVISION='R${year}.${month}.${day}.${hour}'" >> /etc/openwrt_release
 /bin/sync
 EOF
-echo "ZZ_BUILD_ID='${zz_build_uuid}'" > files/etc/zz_build_id
-echo "ZZ_BUILD_HOST='$(hostname)'" >> files/etc/zz_build_id
-echo "ZZ_BUILD_USER='$(whoami)'" >> files/etc/zz_build_id
-echo "ZZ_BUILD_DATE='${zz_build_date}'" >> files/etc/zz_build_id
-echo "ZZ_BUILD_REPO_HASH='$(cd .. && git rev-parse HEAD)'" >> files/etc/zz_build_id
-echo "ZZ_BUILD_LEDE_HASH='$(git rev-parse HEAD)'" >> files/etc/zz_build_id
-echo "make download"
-# === 自动启用三插件 ===
-enable_pkg_if_exists() {
-  local want="$1"
-  pkg_dir="$(find package feeds -maxdepth 3 -type d -iname "*${want}*" | head -n1 || true)"
-  if [ -n "$pkg_dir" ]; then
-    pkg_name="$(basename "$pkg_dir")"
-    cfg="CONFIG_PACKAGE_${pkg_name}"
-    if ! grep -q "^${cfg}=y" .config; then
-      echo "${cfg}=y" >> .config
-      echo "[build] enabled ${cfg} (${pkg_dir})"
-    fi
-  else
-    echo "[build] warn: package ${want} not found"
-  fi
-}
+log "zz_build_uuid: ${zz_build_uuid}"
+{
+  echo "ZZ_BUILD_ID='${zz_build_uuid}'"
+  echo "ZZ_BUILD_HOST='$(hostname)'"
+  echo "ZZ_BUILD_USER='$(whoami)'"
+  echo "ZZ_BUILD_DATE='${zz_build_date}'"
+  echo "ZZ_BUILD_REPO_HASH='$(cd .. && git rev-parse HEAD)'"
+  echo "ZZ_BUILD_LEDE_HASH='$(git rev-parse HEAD)'"
+} > "${build_id_path}"
 
-enable_pkg_if_exists "tailscale"
-enable_pkg_if_exists "easytier"
-enable_pkg_if_exists "lucky"
-make download -j8 || { echo "download failed"; exit 1; }
-echo "make lede"
-make V=0 -j$(nproc) || { echo "make failed"; exit 1; }
+log "Download sources"
+[ -z "$THREAD" ] && THREAD=$(nproc)
+make download -j"$THREAD" || err "Download failed"
+
+log "Start building"
+make V=0 -j"$THREAD" || err "make failed"
+
+log "Build finished!"
