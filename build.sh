@@ -9,6 +9,26 @@ echo "install feeds"
 cat ../xgp.config > .config
 echo "make defconfig"
 make defconfig || { echo "defconfig failed"; exit 1; }
+# === 自动启用三插件 ===
+enable_pkg_if_exists() {
+  local want="$1"
+  pkg_dir="$(find package feeds -maxdepth 3 -type d -iname "*${want}*" | head -n1 || true)"
+  if [ -n "$pkg_dir" ]; then
+    pkg_name="$(basename "$pkg_dir")"
+    cfg="CONFIG_PACKAGE_${pkg_name}"
+    if ! grep -q "^${cfg}=y" .config; then
+      echo "${cfg}=y" >> .config
+      echo "[build] enabled ${cfg} (${pkg_dir})"
+    fi
+  else
+    echo "[build] warn: package ${want} not found"
+  fi
+}
+
+enable_pkg_if_exists "tailscale"
+enable_pkg_if_exists "easytier"
+enable_pkg_if_exists "lucky"
+
 echo "diff initial config and new config:"
 diff ../xgp.config .config
 echo "diff initial config and new config (from old config only):"
